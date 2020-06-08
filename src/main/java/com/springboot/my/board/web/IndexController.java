@@ -1,5 +1,7 @@
 package com.springboot.my.board.web;
 
+import com.springboot.my.board.config.auth.dto.SessionUser;
+import com.springboot.my.board.domain.user.User;
 import com.springboot.my.board.service.posts.PostsService;
 import com.springboot.my.board.web.dto.PostsResponseDto;
 import lombok.RequiredArgsConstructor;
@@ -8,15 +10,23 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
+import javax.servlet.http.HttpSession;
+
 @RequiredArgsConstructor
 @Controller
 public class IndexController {
 
     private final PostsService postsService;
+    private final HttpSession httpSession;
 
     @GetMapping("/")
-    public String index(Model models) {
-        models.addAttribute("posts", postsService.findAllDesc());
+    public String index(Model model) {
+        model.addAttribute("posts", postsService.findAllDesc());
+
+        SessionUser user = (SessionUser) httpSession.getAttribute("user");
+        if(user != null) {
+            model.addAttribute("userName", user.getName());
+        }
         return "index";
     }
 
